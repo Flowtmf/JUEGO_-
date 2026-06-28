@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Sharon - 5 Meses</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Efecto Glitch / Crash */
+        .crasheado {
+            background-color: #000 !important;
+            animation: vibrar 0.1s infinite;
+        }
+        @keyframes vibrar {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -1px) rotate(0deg); }
+        }
+
+        /* Contador */
+        #contador-container {
+            text-align: center;
+            transition: all 1s ease;
+            z-index: 5;
+        }
+        .contador-gigante {
+            font-size: 4rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .contador-pequeno {
+            position: absolute;
+            top: 20px;
+            font-size: 1.5rem;
+        }
+
+        /* Botón Demo */
+        #btn-demo {
+            margin-top: 40px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0);
+            animation: aparecerDesdeLejos 1s ease forwards 3s; 
+        }
+        #btn-demo:hover {
+            background-color: white;
+            color: black;
+        }
+
+        @keyframes aparecerDesdeLejos {
+            0% { opacity: 0; transform: scale(0.1) translateY(100px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Contenedor del Juego */
+        #juego-container {
+            display: none;
+            text-align: center;
+            margin-top: 80px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Título clicable para el easter egg */
+        #titulo-juego {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .opcion-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 1rem;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #555;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.3s;
+        }
+        .opcion-btn:hover {
+            background-color: #333;
+        }
+
+        /* Animación del Pedazo de Hoja */
+        #animacion-hoja {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 250px;
+            background-color: #f4e8c1;
+            color: #111;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            border-radius: 4px;
+            z-index: 10;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .animar {
+            display: flex !important;
+            animation: aparecerYDesvanecer 3.5s forwards;
+        }
+
+        @keyframes aparecerYDesvanecer {
+            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); }
+        }
+
+        /* Pantallas del Easter Egg (Crash) */
+        #pantalla-crash {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: black;
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        #icono-libro {
+            font-size: 2rem;
+            opacity: 0;
+        }
+        .animar-libro {
+            animation: emergerLibro 5s forwards;
+        }
+        @keyframes emergerLibro {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(5); }
+            100% { opacity: 0; transform: scale(8); display: none; }
+        }
+
+        #texto-misterioso {
+            display: none;
+            font-size: 1.5rem;
+            text-align: center;
+            color: white;
+            text-shadow: 0 0 5px white;
+            margin-top: 20px;
+            opacity: 0;
+        }
+        .animar-texto {
+            animation: fadeTexto 4s forwards;
+        }
+        @keyframes fadeTexto {
+            0% { opacity: 0; }
+            30% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Pantalla Final: El Poema */
+        #pantalla-poema {
+            display: none;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            background-color: #050505;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            z-index: 50;
+        }
+        .verso {
+            white-space: pre-wrap;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
+            color: #ddd;
+            text-shadow: 0 0 2px rgba(255,255,255,0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="contador-container" class="contador-gigante">
+        <div id="tiempo">Cargando...</div>
+    </div>
+
+    <button id="btn-demo" onclick="iniciarJuego()">Demo</button>
+
+    <div id="juego-container">
+        <h1 id="titulo-juego" onclick="activarCrash()">El Enigma</h1>
+        
+        <h2 id="pregunta-texto">Pregunta</h2>
+        <div id="opciones-container"></div>
+        <p id="mensaje-error" style="color: red; display: none; margin-top: 15px;">Incorrecto...</p>
+
+        <div id="animacion-hoja">
+            <span id="texto-hoja">Fragmento</span>
+        </div>
+    </div>
+
+    <div id="pantalla-crash">
+        <div id="icono-libro">📖</div>
+        <div id="texto-misterioso">Pista?... Regalo?<br>..Es algo?...No es nada?...</div>
+    </div>
+
+    <div id="pantalla-poema">
+        <div class="verso" id="texto-poema">
+Para mi mujer ♥️
+
+Mi mujer ♥️...
+
+Hay personas que miran el cielo buscando respuestas;
+yo solo necesito mirarte a ti
+para comprender por qué las estrellas
+jamás dejaron de escribir poesía.
+
+Porque eres un jardín
+que aprendió a florecer incluso en invierno;
+un amanecer que venció a la noche
+sin levantar la voz.
+
+Eres la metáfora favorita del universo,
+la rima que el viento repite en secreto,
+la página donde el destino
+decidió escribir sus versos más perfectos.
+
+Tu cuerpo es un paisaje
+que la luna contempla con envidia;
+una obra tan delicada
+que hasta el tiempo pasa despacio para admirarla.
+
+Tus ojos son dos océanos
+donde mi alma aprendió a navegar;
+y cada vez que me miran,
+mi corazón olvida cómo regresar.
+
+Tu sonrisa es un amanecer
+que nunca deja de nacer;
+cada una de tus risas
+es un sol enseñándole al mundo a crecer.
+
+Tu cabello es la noche
+cuando las estrellas deciden descansar;
+quisiera perderme en él
+como el viento se pierde sobre el mar.
+
+Tus labios parecen el lugar
+donde los besos fueron creados;
+como si el amor, antes de existir,
+hubiera vivido siempre entre ellos guardado.
+
+Tu cuello es un sendero de luna,
+tus hombros son refugios de calma;
+y tus abrazos...
+son la única casa que reconoce mi alma.
+
+Tu silueta tiene la elegancia
+con la que un río abraza la montaña;
+cada curva parece una estrofa
+que Dios escribió una mañana.
+
+Y es que no existe rincón en ti
+que no inspire poesía;
+eres el verso más hermoso
+que encontró mi vida.
+
+Mi mujer ♥️...
+
+Hay algo curioso.
+
+Desde que llegaste,
+las palabras comenzaron a quedarse pequeñas.
+Como si supieran
+que nunca serían suficientes para describirte.
+
+Por eso escribo.
+
+No porque crea que un poema pueda alcanzarte,
+sino porque cada letra intenta acercarse
+a la inmensidad de lo que siento.
+
+Y quizá algún día...
+
+Cuando el tiempo haya guardado cada recuerdo,
+cuando nuestras risas se hayan convertido en constelaciones,
+descubras que algunas palabras
+nunca fueron solamente palabras.
+
+Que ciertos versos
+siempre estuvieron esperando ser encontrados.
+
+Que algunos silencios
+también saben contar historias.
+
+Y que existen promesas
+que no se anuncian...
+
+Se esconden entre líneas,
+como las estrellas durante el día,
+esperando el momento perfecto
+para volver a brillar.
+
+Mientras tanto...
+
+Déjame seguir amando cada detalle de ti.
+
+Déjame seguir perdiéndome en tu mirada,
+que parece un cielo donde nunca anochece.
+
+Déjame seguir admirando tu cuerpo
+como quien contempla una obra de arte
+sin terminar jamás de descubrirla.
+
+Déjame seguir enamorándome
+de la forma en que ríes,
+de la dulzura con la que hablas,
+de la paz que llevas contigo.
+
+Porque tú no solo eres hermosa...
+
+Eres ese tipo de belleza
+que no termina en los ojos;
+empieza en el corazón
+y se queda viviendo para siempre.
+
+Mi mujer ♥️...
+
+Si alguna vez el universo escribiera un libro
+sobre la definición del amor,
+estoy seguro de que tú serías el primer capítulo.
+
+Aunque... pensándolo bien...
+
+Tal vez no el primero.
+
+Porque las historias más valiosas
+no siempre comienzan donde creemos.
+
+Algunas empiezan mucho antes,
+en pequeños detalles,
+en palabras aparentemente normales,
+en recuerdos que esperan pacientemente
+hasta que alguien descubre que, desde el principio,
+todo estaba siendo escrito con amor.
+
+Y cuando llegue ese momento...
+
+Espero que sonrías.
+
+Porque entenderás que nunca hubo un solo poema.
+
+Siempre hubo una historia entera...
+
+Una historia cuyo lugar favorito, desde la primera página hasta la última, siempre ha sido tu corazón. ♥️
+        </div>
+    </div>
+
+    <script>
+        // 1. Contador
+        const fechaObjetivo = new Date("July 13, 2026 00:00:00").getTime();
+        const actualizarContador = setInterval(function() {
+            const ahora = new Date().getTime();
+            const distancia = fechaObjetivo - ahora;
+
+            const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+            document.getElementById("tiempo").innerHTML = 
+                dias + "d " + horas + "h " + minutos + "m " + segundos + "s ";
+
+            if (distancia < 0) {
+                clearInterval(actualizarContador);
+                document.getElementById("tiempo").innerHTML = "¡ES HOY!";
+            }
+        }, 1000);
+
+        function iniciarJuego() {
+            document.getElementById("btn-demo").style.display = "none";
+            const contador = document.getElementById("contador-container");
+            contador.classList.remove("contador-gigante");
+            contador.classList.add("contador-pequeno");
+            document.getElementById("juego-container").style.display = "block";
+        }
+
+        // 2. Easter Egg (Crash)
+        let clicksTitulo = 0;
+        let crashEjecutado = false;
+
+        function activarCrash() {
+            if(crashEjecutado) return; // Solo ocurre una vez
+            clicksTitulo++;
+            if (clicksTitulo === 3) {
+                crashEjecutado = true;
+                
+                // Efecto Glitch inicial
+                document.body.classList.add("crasheado");
+                document.getElementById("juego-container").style.display = "none";
+                document.getElementById("contador-container").style.display = "none";
+
+                setTimeout(() => {
+                    document.body.classList.remove("crasheado");
+                    document.getElementById("pantalla-crash").style.display = "flex";
+                    
+                    // Animación del libro saliendo
+                    const libro = document.getElementById("icono-libro");
+                    libro.classList.add("animar-libro");
+
+                    // Mostrar texto misterioso justo cuando el libro desaparece
+                    setTimeout(() => {
+                        const texto = document.getElementById("texto-misterioso");
+                        texto.style.display = "block";
+                        texto.classList.add("animar-texto");
+
+                        // Devolver todo a la normalidad después del texto
+                        setTimeout(() => {
+                            document.getElementById("pantalla-crash").style.display = "none";
+                            document.getElementById("juego-container").style.display = "block";
+                            document.getElementById("contador-container").style.display = "block";
+                        }, 4000);
+
+                    }, 4000); // Tiempo que tarda el libro en hacerse gigante
+
+                }, 500); // Medio segundo de glitch
+            }
+        }
+
+                // 3. Las 10 Preguntas (Con tus respuestas configuradas)
+        let nivelActual = 0;
+        const niveles = [
+            {
+                pregunta: "¿Qué es lo que más me hace sentir amado? ♥️",
+                opciones: ["A. Que me den regalos.", "B. Pasar tiempo contigo.", "C. Que me escriban cosas bonitas.", "D. Los abrazos."],
+                respuestaCorrecta: 1 // B
+            },
+            {
+                pregunta: "¿Cuál creo que es mi mayor miedo?",
+                opciones: ["A. Quedarme solo.", "B. Fracasar en mis sueños.", "C. Perder a las personas que amo.", "D. No ser suficiente."],
+                respuestaCorrecta: 1 // B
+            },
+            {
+                pregunta: "Cuando estoy triste, ¿qué hago normalmente?",
+                opciones: ["A. Me quedo callado.", "B. Escucho música.", "C. Busco hablar contigo.", "D. Intento distraerme."],
+                respuestaCorrecta: 1 // B
+            },
+            {
+                pregunta: "¿Qué valoro más en una relación?",
+                opciones: ["A. La confianza.", "B. La lealtad.", "C. La comunicación.", "D. El respeto."],
+                respuestaCorrecta: 3 // D
+            },
+            {
+                pregunta: "¿Qué detalle tuyo me derrite el corazón? ♥️",
+                opciones: ["A. Tu sonrisa.", "B. Tu voz.", "C. Tus abrazos.", "D. La forma en que me hablas."],
+                respuestaCorrecta: 2 // C
+            },
+            {
+                pregunta: "Si pudiera pedir un deseo, ¿cuál sería?",
+                opciones: ["A. Tener mucho dinero.", "B. Viajar por el mundo.", "C. Formar un futuro contigo.", "D. Cumplir todas mis metas."],
+                respuestaCorrecta: 3 // D
+            },
+            {
+                pregunta: "¿Qué creo que es mi mayor defecto?",
+                opciones: ["A. Sobrepensar.", "B. Ser muy orgulloso.", "C. Callarme lo que siento.", "D. Exigir demasiado de mí."],
+                respuestaCorrecta: 1 // B
+            },
+            {
+                pregunta: "¿Qué momento del día disfruto más contigo?",
+                opciones: ["A. Las mañanas.", "B. Las tardes.", "C. Las noches hablando.", "D. Cualquier momento."],
+                respuestaCorrecta: 3 // D
+            },
+            {
+                pregunta: "¿Qué pienso primero cuando recibo un mensaje tuyo? ♥️",
+                opciones: ["A. Sonrío.", "B. Lo respondo enseguida.", "C. Me emociono.", "D. Quiero seguir hablando contigo."],
+                respuestaCorrecta: 2 // C
+            },
+            {
+                pregunta: "¿Qué significa Sharon para mí? ♥️",
+                opciones: ["A. Mi felicidad.", "B. Mi paz.", "C. Mi hogar.", "D. Todo lo anterior. ♥️"],
+                respuestaCorrecta: 3 // D
+            }
+        ];
+        
+
+        function cargarNivel() {
+            if (nivelActual < niveles.length) {
+                const nivel = niveles[nivelActual];
+                document.getElementById("pregunta-texto").innerText = `Pregunta ${nivelActual + 1}/10\n\n${nivel.pregunta}`;
+                document.getElementById("mensaje-error").style.display = "none";
+                
+                const contenedorOpciones = document.getElementById("opciones-container");
+                contenedorOpciones.innerHTML = ""; 
+                
+                nivel.opciones.forEach((opcion, index) => {
+                    const btn = document.createElement("button");
+                    btn.className = "opcion-btn";
+                    btn.innerText = opcion;
+                    btn.onclick = () => verificarRespuesta(index);
+                    contenedorOpciones.appendChild(btn);
+                });
+            } else {
+                // Final del juego: Mostrar el Poema
+                document.getElementById("juego-container").style.display = "none";
+                document.getElementById("contador-container").style.display = "none";
+                document.getElementById("pantalla-poema").style.display = "block";
+            }
+        }
+
+        function verificarRespuesta(indiceSeleccionado) {
+            const respuestaCorrecta = niveles[nivelActual].respuestaCorrecta;
+
+            if (indiceSeleccionado === respuestaCorrecta) {
+                document.getElementById("mensaje-error").style.display = "none";
+                const botones = document.querySelectorAll(".opcion-btn");
+                botones.forEach(b => b.disabled = true);
+
+                const hoja = document.getElementById("animacion-hoja");
+                const textoHoja = document.getElementById("texto-hoja");
+                
+                textoHoja.innerHTML = `Fragmento ${nivelActual + 1}/10`;
+                hoja.classList.remove("animar");
+                void hoja.offsetWidth; 
+                hoja.classList.add("animar");
+
+                setTimeout(() => {
+                    hoja.classList.remove("animar");
+                    nivelActual++;
+                    cargarNivel();
+                }, 3500);
+
+            } else {
+                document.getElementById("mensaje-error").style.display = "block";
+            }
+        }
+
+        cargarNivel();
+    </script>
+</body>
+</html>
